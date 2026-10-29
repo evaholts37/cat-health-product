@@ -42,15 +42,17 @@ def render(lines: list[str]) -> str:
             return
         rows = [row.strip().strip("|").split("|") for row in table]
         rows = [[cell.strip() for cell in row] for row in rows]
+        is_conclusions = rows[0][0].startswith("Прогалина")
         head = "".join(f'<th scope="col">{inline(cell)}</th>' for cell in rows[0])
         body = "".join(
             "<tr>" + "".join(
-                f'<th scope="row">{inline(cell)}</th>' if index == 0 else f"<td>{inline(cell)}</td>"
+                f'<th scope="row">{inline(cell)}</th>' if index == 0 and not is_conclusions else f"<td>{inline(cell)}</td>"
                 for index, cell in enumerate(row)
             ) + "</tr>"
             for row in rows[2:]
         )
-        chunks.append(f'<div class="table-wrap" tabindex="0" aria-label="Таблиця порівняння"><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
+        table_class = ' class="conclusions-table"' if is_conclusions else ""
+        chunks.append(f'<div class="table-wrap" tabindex="0" aria-label="Таблиця порівняння"><table{table_class}><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>')
         table.clear()
 
     for raw in lines + [""]:
@@ -81,6 +83,7 @@ sections = re.split(r"(?m)^## (.+)$", source)
 section_html = {}
 for index in range(1, len(sections), 2):
     section_html[sections[index]] = render(sections[index + 1].strip().splitlines())
+section_html["ВИСНОВКИ"] = section_html["ВИСНОВКИ"].replace("<p>", '<p class="section-subtitle">', 1)
 
 gallery = """
 <div class="evidence-head">
@@ -141,7 +144,8 @@ html = """<!doctype html>
     .section-title { display: flex; align-items: baseline; gap: 18px; margin-bottom: 30px; }
     .section-number { color: var(--accent); font: 600 1.04rem/1 ui-monospace, monospace; }
     h2 { margin: 0; font-size: clamp(2rem, 3vw, 3rem); line-height: 1.15; letter-spacing: -.045em; }
-    h3 { margin: 58px 0 22px; font-size: 1.38rem; line-height: 1.25; letter-spacing: -.025em; }
+    .section-subtitle { max-width: 68ch; margin: 0 0 30px; color: #d3e3df; font-size: clamp(1.08rem, 1.4vw, 1.22rem); line-height: 1.55; }
+    h3 { margin: 58px 0 22px; font-size: clamp(1.45rem, 2vw, 1.8rem); line-height: 1.25; letter-spacing: -.025em; }
     .report-section > p, .report-section > ol { max-width: 75ch; }
     p { margin: 0 0 18px; }
     strong { color: #f3f6f1; font-weight: 680; }
@@ -157,6 +161,12 @@ html = """<!doctype html>
     tbody th { width: 160px; min-width: 160px; color: var(--warm); font-weight: 700; }
     tbody tr:nth-child(even) { background: #14222a; }
     td { min-width: 245px; color: #c6d3d3; }
+    .conclusions-table { table-layout: fixed; min-width: 1040px; }
+    .conclusions-table thead th:nth-child(1) { width: 38%; }
+    .conclusions-table thead th:nth-child(2) { width: 44%; }
+    .conclusions-table thead th:nth-child(3) { width: 18%; }
+    .conclusions-table td { min-width: 0; }
+    .conclusions-table tbody td:first-child { color: #d6e2df; }
     td a, th a { white-space: normal; }
     .evidence-head { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: baseline; margin-top: 70px; }
     .evidence-head h3 { margin: 0; }
