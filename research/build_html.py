@@ -8,6 +8,13 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 source = (ROOT / "research.md").read_text(encoding="utf-8")
+COMPETITOR_GROUPS = {
+    "DogCatApp": "Хард",
+    "Nosik": "Хард",
+    "Pet Health": "Хард",
+    "Todoist": "Софт",
+    "Felivo": "Аспіраційні",
+}
 
 
 def inline(value: str) -> str:
@@ -43,12 +50,20 @@ def render(lines: list[str]) -> str:
         rows = [row.strip().strip("|").split("|") for row in table]
         rows = [[cell.strip() for cell in row] for row in rows]
         is_conclusions = rows[0][0].startswith("Прогалина")
+        is_competitor_matrix = rows[0][0] == "Продукт"
         head = "".join(f'<th scope="col">{inline(cell)}</th>' for cell in rows[0])
+
+        def body_cell(cell: str, index: int) -> str:
+            if index == 0 and is_competitor_matrix:
+                group = COMPETITOR_GROUPS.get(cell.strip("*"))
+                if group:
+                    return f'<th scope="row">{inline(cell)}<span class="competitor-group">{group}</span></th>'
+            if index == 0 and not is_conclusions:
+                return f'<th scope="row">{inline(cell)}</th>'
+            return f"<td>{inline(cell)}</td>"
+
         body = "".join(
-            "<tr>" + "".join(
-                f'<th scope="row">{inline(cell)}</th>' if index == 0 and not is_conclusions else f"<td>{inline(cell)}</td>"
-                for index, cell in enumerate(row)
-            ) + "</tr>"
+            "<tr>" + "".join(body_cell(cell, index) for index, cell in enumerate(row)) + "</tr>"
             for row in rows[2:]
         )
         table_class = ' class="conclusions-table"' if is_conclusions else ""
@@ -86,9 +101,9 @@ for index in range(1, len(sections), 2):
 section_html["ВИСНОВКИ"] = section_html["ВИСНОВКИ"].replace("<p>", '<p class="section-subtitle">', 1)
 
 gallery = """
-<div class="evidence-head">
+<div class="evidence-head" id="екрани-дослідження">
   <h3>Екрани з дослідження</h3>
-  <p>Кадри з тестових акаунтів позначені «Власне проходження». Felivo — публічна сторінка. Знімки профілю з email або ім’ям прибрані з публікації.</p>
+  <p>Кадри з тестових акаунтів позначені «Власне проходження». Felivo — публічна сторінка. Знімки профілю з email або ім’ям прибрані з публікації. Натисніть на скріншот, щоб відкрити його у повному розмірі.</p>
 </div>
 <div class="evidence-grid">
   <figure><a href="screens/own/nosik-home-next-actions.png"><img src="screens/own/nosik-home-next-actions.png" alt="Головна Nosik із найближчими справами та назвою препарату" loading="lazy"></a><figcaption><b>Nosik</b><span>Власне проходження · Найближчі дії</span></figcaption></figure>
@@ -132,6 +147,7 @@ html = """<!doctype html>
     .masthead { padding: clamp(55px, 8vw, 118px) 0 68px; border-bottom: 1px solid var(--line); }
     h1 { max-width: 900px; margin: 0; font-size: clamp(2.8rem, 6.5vw, 5.6rem); line-height: 1.04; font-weight: 650; letter-spacing: -.065em; }
     .lead { max-width: 720px; margin: 28px 0 0; color: #c6d4d3; font-size: clamp(1.05rem, 1.4vw, 1.28rem); line-height: 1.55; }
+    .research-meta { max-width: 820px; margin: 22px 0 0; color: var(--muted); font-size: .92rem; }
     .mast-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 34px; }
     .mast-links a, .jump a { display: inline-flex; align-items: center; min-height: 38px; padding: 6px 13px; border: 1px solid #426658; border-radius: 99px; color: #d8f6e9; text-decoration: none; font-size: .88rem; }
     .mast-links a:hover, .jump a:hover { background: #214238; }
@@ -141,6 +157,13 @@ html = """<!doctype html>
     .jump { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 0; }
     .jump a { border-color: var(--line); color: var(--muted); }
     .report-section { padding: 78px 0 88px; border-bottom: 1px solid var(--line); scroll-margin-top: 18px; }
+    .source-section { padding: 68px 0 56px; border-bottom: 1px solid var(--line); scroll-margin-top: 18px; }
+    .source-section > p { max-width: 74ch; color: var(--muted); }
+    .source-table { table-layout: fixed; min-width: 760px; }
+    .source-table thead th:nth-child(1) { width: 22%; }
+    .source-table thead th:nth-child(2) { width: 49%; }
+    .source-table thead th:nth-child(3) { width: 29%; }
+    .source-table td { min-width: 0; }
     .section-title { display: flex; align-items: baseline; gap: 18px; margin-bottom: 30px; }
     .section-number { color: var(--accent); font: 600 1.04rem/1 ui-monospace, monospace; }
     h2 { margin: 0; font-size: clamp(2rem, 3vw, 3rem); line-height: 1.15; letter-spacing: -.045em; }
@@ -159,6 +182,7 @@ html = """<!doctype html>
     tbody tr:last-child > * { border-bottom: 0; }
     thead th { background: #1a2b34; color: #d8e9e4; font-size: .8rem; letter-spacing: .02em; }
     tbody th { width: 160px; min-width: 160px; color: var(--warm); font-weight: 700; }
+    .competitor-group { display: block; margin-top: 5px; color: var(--muted); font-size: .8rem; font-weight: 400; line-height: 1.35; }
     tbody tr:nth-child(even) { background: #14222a; }
     td { min-width: 245px; color: #c6d3d3; }
     .conclusions-table { table-layout: fixed; min-width: 1040px; }
@@ -168,9 +192,9 @@ html = """<!doctype html>
     .conclusions-table td { min-width: 0; }
     .conclusions-table tbody td:first-child { color: #d6e2df; }
     td a, th a { white-space: normal; }
-    .evidence-head { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: baseline; margin-top: 70px; }
-    .evidence-head h3 { margin: 0; }
-    .evidence-head p { margin: 0; color: var(--muted); }
+    .evidence-head { margin-top: 70px; }
+    .evidence-head h3 { margin: 0 0 12px; }
+    .evidence-head p { max-width: 76ch; margin: 0; color: var(--muted); }
     .evidence-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
     figure { min-width: 0; margin: 0; }
     figure > a { display: flex; align-items: center; justify-content: center; height: 300px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #17242d; }
@@ -191,7 +215,6 @@ html = """<!doctype html>
       #repo-nav .repo-nav-pages { display: flex; flex-wrap: wrap; }
       #repo-nav a { padding: 4px 7px; }
       .evidence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .evidence-head { grid-template-columns: 1fr; gap: 12px; }
       .report-section { padding: 62px 0 72px; }
     }
     @media (max-width: 480px) {
@@ -217,10 +240,21 @@ html = """<!doctype html>
     <header class="masthead">
       <h1>Наступна дія має бути очевидною.</h1>
       <p class="lead">Дослідження досвіду догляду за 1–5 котами: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
+      <p class="research-meta">Стан матеріалів: <time datetime="2026-10-29">29 жовтня 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>.</p>
       <div class="mast-links"><a href="research.md">Повний звіт у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
       <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Mobbin</span></div>
-      <nav class="jump" aria-label="Розділи сторінки"><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a></nav>
+      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a></nav>
     </header>
+    <section id="звідки-дані" class="source-section" aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Звідки дані</h2>
+      <p>Спостереження з тестових акаунтів відокремлено від відкритих джерел і прикладів Mobbin. Продуктовий бриф задає цілі та рішення, але не є доказом про ринок.</p>
+      <div class="table-wrap" tabindex="0" aria-label="Походження матеріалів"><table class="source-table"><thead><tr><th scope="col">Позначка</th><th scope="col">Джерело</th><th scope="col">Як використано</th></tr></thead><tbody>
+        <tr><th scope="row">Власне проходження</th><td>Записи екрана із тестових акаунтів, надані засновницею; <a href="#екрани-дослідження">опубліковані кадри</a> збережені у <code>screens/own/</code>. Введені дані, за її словами, фіктивні. <a href="notes/06-android-flows.md">Android-флоу</a>, <a href="notes/07-todoist-own.md">Todoist</a>.</td><td>Перевірені екрани й кроки сценарію. Кадри профілю з email або ім’ям не опубліковано.</td></tr>
+        <tr><th scope="row">Публічне</th><td>Сайти, офіційні довідки, сторінки застосунків, відгуки й демо-відео без входу. Джерела перелічено у <a href="notes/03-competitors.md">відборі</a> та <a href="notes/04-matrix.md">матриці</a>; приклад — <a href="screens/felivo-detail-public-mobile.png">публічний кадр Felivo</a>.</td><td>Факти про заявлені функції та доступні без логіну екрани.</td></tr>
+        <tr><th scope="row">Mobbin</th><td>Екрани сторонніх застосунків, переглянуті через підключення засновниці. <a href="notes/05-benchmark.md">Метод і джерела бенчмарку</a>.</td><td>Приклади UX-механізмів; це не проходження акаунтів у цих застосунках.</td></tr>
+        <tr><th scope="row">Бриф</th><td><a href="../Codex.md">Codex.md</a> — цілі, аудиторія та продуктові рішення.</td><td>Основа оцінки й гіпотез, а не факт про конкурентів.</td></tr>
+      </tbody></table></div>
+    </section>
     REPORT
     <footer class="footer"><span>Джерела й межі висновків наведені біля кожного спостереження.</span><a href="#конкуренти">Повернутися до початку ↑</a></footer>
   </main>
