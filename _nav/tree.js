@@ -5,5 +5,11 @@ window.REPO_NAV_TREE = [
     pages: [
       { title: "Огляд продукту", path: "index.html", children: [] }
     ]
+  },
+  {
+    label: "Ресерч",
+    pages: [
+      { title: "Висновки дослідження", path: "research/research.html", children: [] }
+    ]
   }
 ];
