@@ -262,7 +262,7 @@ HTML = f'''<!doctype html>
       <div class="job-group"><h3>Related jobs · J1–J5</h3><div class="job-grid">{job_cards(related_items, 'J')}</div></div>
       <div class="job-group"><h3>Emotional jobs · E1–E2</h3><div class="job-grid">{job_cards(emotional, 'E')}</div></div>
       <div class="job-group"><h3>Social jobs · S1–S2</h3><div class="job-grid">{job_cards(social, 'S')}</div></div>
-      <div class="job-group hypothesis-group"><h3>Гіпотези · H1–H4</h3><p class="section-intro">Ці jobs не входять до основної ієрархії. Кожен потребує перевірки.</p><div class="job-grid">{job_cards(hypotheses, 'H')}</div></div>
+      <div class="job-group hypothesis-group"><h3>Перевірювані jobs · H1–H4</h3><p class="section-intro">Частину потреб підтверджено окремими свідченнями. Позначка [?] лишається там, де даних про людей або наше рішення бракує.</p><div class="job-grid">{job_cards(hypotheses, 'H')}</div></div>
     </section>
 
     <section id="матриця" class="report-section" aria-labelledby="matrix-heading">
