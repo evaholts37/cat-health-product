@@ -1,6 +1,6 @@
 """Build the static, source-linked research page from research.md."""
 
-from html import escape
+from html import escape, unescape
 from pathlib import Path
 import re
 from urllib.parse import unquote, urlsplit
@@ -21,7 +21,7 @@ def inline(value: str) -> str:
     value = escape(value)
     value = re.sub(
         r"\[([^\]]+)\]\(([^)]+)\)",
-        lambda match: f'<a href="{escape(match.group(2), quote=True)}">{match.group(1)}</a>',
+        lambda match: f'<a href="{escape(unescape(match.group(2)), quote=True)}">{match.group(1)}</a>',
         value,
     )
     value = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", value)
@@ -32,6 +32,7 @@ def render(lines: list[str]) -> str:
     chunks = []
     paragraph = []
     ordered = []
+    unordered = []
     table = []
 
     def flush_paragraph() -> None:
@@ -43,6 +44,11 @@ def render(lines: list[str]) -> str:
         if ordered:
             chunks.append("<ol>" + "".join(f"<li>{inline(item)}</li>" for item in ordered) + "</ol>")
             ordered.clear()
+
+    def flush_unordered() -> None:
+        if unordered:
+            chunks.append("<ul>" + "".join(f"<li>{inline(item)}</li>" for item in unordered) + "</ul>")
+            unordered.clear()
 
     def flush_table() -> None:
         if not table:
@@ -75,21 +81,30 @@ def render(lines: list[str]) -> str:
         if line.startswith("|"):
             flush_paragraph()
             flush_ordered()
+            flush_unordered()
             table.append(line)
             continue
         flush_table()
         if line.startswith("### "):
             flush_paragraph()
             flush_ordered()
+            flush_unordered()
             chunks.append(f"<h3>{inline(line[4:])}</h3>")
         elif re.match(r"^\d+\. ", line):
             flush_paragraph()
+            flush_unordered()
             ordered.append(re.sub(r"^\d+\. ", "", line))
+        elif line.startswith("- "):
+            flush_paragraph()
+            flush_ordered()
+            unordered.append(line[2:])
         elif not line:
             flush_paragraph()
             flush_ordered()
+            flush_unordered()
         else:
             flush_ordered()
+            flush_unordered()
             paragraph.append(line)
     return "\n".join(chunks)
 
@@ -103,7 +118,7 @@ section_html["ВИСНОВКИ"] = section_html["ВИСНОВКИ"].replace("<p>
 gallery = """
 <div class="evidence-head" id="екрани-дослідження">
   <h3>Екрани з дослідження</h3>
-  <p>Кадри з тестових акаунтів позначені «Власне проходження». Felivo — публічна сторінка. Знімки профілю з email або ім’ям прибрані з публікації. Натисніть на скріншот, щоб відкрити його у повному розмірі.</p>
+  <p>Кадри з тестових акаунтів позначені «Власне проходження». Felivo — публічна сторінка. Введені у флоу дані вигадані. Натисніть на скріншот, щоб відкрити його у повному розмірі.</p>
 </div>
 <div class="evidence-grid">
   <figure><a href="screens/own/nosik-home-next-actions.png"><img src="screens/own/nosik-home-next-actions.png" alt="Головна Nosik із найближчими справами та назвою препарату" loading="lazy"></a><figcaption><b>Nosik</b><span>Власне проходження · Найближчі дії</span></figcaption></figure>
@@ -111,13 +126,29 @@ gallery = """
   <figure><a href="screens/own/dogcat-calendar.png"><img src="screens/own/dogcat-calendar.png" alt="Календар DogCatApp із фільтром кота" loading="lazy"></a><figcaption><b>DogCatApp</b><span>Власне проходження · Календар</span></figcaption></figure>
   <figure><a href="screens/own/todoist-story-repeat-options.png"><img src="screens/own/todoist-story-repeat-options.png" alt="Окреме меню повторення задачі в Todoist" loading="lazy"></a><figcaption><b>Todoist</b><span>Власне проходження · Повторення</span></figcaption></figure>
   <figure><a href="screens/felivo-detail-public-mobile.png"><img src="screens/felivo-detail-public-mobile.png" alt="Публічна мобільна сторінка Felivo" loading="lazy"></a><figcaption><b>Felivo</b><span>Публічна сторінка · Деталі продукту</span></figcaption></figure>
+  <figure><a href="screens/own/nosik-completed-cycle-20261101.png"><img src="screens/own/nosik-completed-cycle-20261101.png" alt="Nosik показує запис виконаної обробки й наступний термін через 30 днів" loading="lazy"></a><figcaption><b>Nosik</b><span>1 листопада · Факт і наступний цикл</span></figcaption></figure>
+  <figure><a href="screens/own/dogcat-three-pet-calendar-20261101.png"><img src="screens/own/dogcat-three-pet-calendar-20261101.png" alt="DogCatApp: календар і вибір одного з трьох профілів" loading="lazy"></a><figcaption><b>DogCatApp</b><span>1 листопада · Вибір тварини</span></figcaption></figure>
+  <figure><a href="screens/own/pet-health-two-pet-activity-20261101.png"><img src="screens/own/pet-health-two-pet-activity-20261101.png" alt="Pet Health: спільні лічильники та дві картки тварин" loading="lazy"></a><figcaption><b>Pet Health</b><span>1 листопада · Дві тварини</span></figcaption></figure>
+  <figure><a href="screens/own/pawme-ai-species-selection-20261101.png"><img src="screens/own/pawme-ai-species-selection-20261101.png" alt="PawMe: автоматично вибрано собаку для фото кота; вид можна виправити" loading="lazy"></a><figcaption><b>PawMe</b><span>1 листопада · Ручне виправлення виду</span></figcaption></figure>
 </div>
 """
 
 parts = []
-ids = {"КОНКУРЕНТИ": "конкуренти", "БЕНЧМАРК": "бенчмарк", "ПАТЕРНИ": "патерни", "ВИСНОВКИ": "висновки"}
-for number, title in enumerate(ids, 1):
-    parts.append(f'<section id="{ids[title]}" class="report-section" aria-labelledby="heading-{ids[title]}"><div class="section-title"><span class="section-number">{number:02d}</span><h2 id="heading-{ids[title]}">{title.capitalize()}</h2></div>{section_html[title]}{gallery if title == "КОНКУРЕНТИ" else ""}</section>')
+sections_to_show = [
+    ("КОНКУРЕНТИ", "конкуренти", "Конкуренти"),
+    ("БЕНЧМАРК", "бенчмарк", "Бенчмарк"),
+    ("ПАТЕРНИ", "патерни", "Патерни"),
+    ("ВИСНОВКИ", "висновки", "Висновки"),
+    ("ПУБЛІЧНІ ВІДГУКИ КОРИСТУВАЧІВ", "відгуки", "Публічні відгуки"),
+    ("ФОРУМИ: ЯК ПАМ’ЯТАЮТЬ ПРО ДОГЛЯД ЗА КОТАМИ", "форуми", "Форуми"),
+    ("ПОРІВНЯННЯ ЗІ СВІДЧЕННЯМИ ВЛАСНИКІВ СОБАК", "собаки", "Коти й собаки"),
+    ("Доресерч після персон", "доресерч-після-персон", "Доресерч після персон"),
+    ("Ручне проходження конкурентів 1 листопада", "ручне-проходження-конкурентів-1-листопада", "Ручне проходження 1 листопада"),
+]
+for number, (title, section_id, label) in enumerate(sections_to_show, 1):
+    if title not in section_html:
+        raise ValueError(f"Missing research section: {title}")
+    parts.append(f'<section id="{section_id}" class="report-section" aria-labelledby="heading-{section_id}"><div class="section-title"><span class="section-number">{number:02d}</span><h2 id="heading-{section_id}">{label}</h2></div>{section_html[title]}{gallery if title == "КОНКУРЕНТИ" else ""}</section>')
 
 html = """<!doctype html>
 <html lang="uk">
@@ -125,8 +156,8 @@ html = """<!doctype html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Дослідження MVP · Здоров’я котів</title>
-  <meta name="description" content="Конкуренти, бенчмарк, UX-патерни та гіпотези для MVP застосунку здоров’я котів.">
+  <title>Дослідження MVP · Догляд за котами й собаками</title>
+  <meta name="description" content="Конкуренти, відгуки, форуми, власні проходження та гіпотези для застосунку догляду за котами й собаками.">
   <link rel="stylesheet" href="../_nav/nav.css">
   <style>
     :root { --bg: #0d151b; --panel: #14212a; --line: #2a3b44; --text: #e9f0ed; --muted: #aabbbd; --accent: #9fe4ce; --warm: #edc48a; }
@@ -239,18 +270,20 @@ html = """<!doctype html>
   <main class="page">
     <header class="masthead">
       <h1>Наступна дія має бути очевидною.</h1>
-      <p class="lead">Дослідження досвіду догляду за 1–5 котами: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
-      <p class="research-meta">Стан матеріалів: <time datetime="2026-10-29">29 жовтня 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>.</p>
+      <p class="lead">Дослідження догляду за котами й собаками: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
+      <p class="research-meta">Стан матеріалів: <time datetime="2026-11-01">1 листопада 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>.</p>
       <div class="mast-links"><a href="research.md">Повний звіт у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
-      <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Mobbin</span></div>
-      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a></nav>
+      <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Відгуки й форуми</span><span>Mobbin</span></div>
+      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a></nav>
     </header>
     <section id="звідки-дані" class="source-section" aria-labelledby="sources-heading">
       <h2 id="sources-heading">Звідки дані</h2>
       <p>Спостереження з тестових акаунтів відокремлено від відкритих джерел і прикладів Mobbin. Продуктовий бриф задає цілі та рішення, але не є доказом про ринок.</p>
       <div class="table-wrap" tabindex="0" aria-label="Походження матеріалів"><table class="source-table"><thead><tr><th scope="col">Позначка</th><th scope="col">Джерело</th><th scope="col">Як використано</th></tr></thead><tbody>
-        <tr><th scope="row">Власне проходження</th><td>Записи екрана із тестових акаунтів, надані засновницею; <a href="#екрани-дослідження">опубліковані кадри</a> збережені у <code>screens/own/</code>. Введені дані, за її словами, фіктивні. <a href="notes/06-android-flows.md">Android-флоу</a>, <a href="notes/07-todoist-own.md">Todoist</a>.</td><td>Перевірені екрани й кроки сценарію. Кадри профілю з email або ім’ям не опубліковано.</td></tr>
+        <tr><th scope="row">Власне проходження</th><td>Записи екрана із тестових акаунтів, надані засновницею; <a href="#екрани-дослідження">опубліковані кадри</a> збережені у <code>screens/own/</code>. Введені дані вигадані. <a href="notes/06-android-flows.md">Флоу 29 жовтня</a>, <a href="notes/09-android-flows-2026-11-01.md">флоу 1 листопада</a>, <a href="notes/07-todoist-own.md">Todoist</a>.</td><td>Перевірені екрани й кроки сценарію. Коди запрошень та системні списки контактів не опубліковано.</td></tr>
         <tr><th scope="row">Публічне</th><td>Сайти, офіційні довідки, сторінки застосунків, відгуки й демо-відео без входу. Джерела перелічено у <a href="notes/03-competitors.md">відборі</a> та <a href="notes/04-matrix.md">матриці</a>; приклад — <a href="screens/felivo-detail-public-mobile.png">публічний кадр Felivo</a>.</td><td>Факти про заявлені функції та доступні без логіну екрани.</td></tr>
+        <tr><th scope="row">Відгуки</th><td>Публічні відгуки в App Store та Google Play; <a href="#відгуки">добірка</a> нижче.</td><td>Окремі повідомлення про власний досвід, без вимірювання поширеності.</td></tr>
+        <tr><th scope="row">Форуми</th><td>Першоособові дописи про догляд за <a href="notes/cat-care-forums.md">котами</a> і <a href="notes/dog-care-comparison.md">собаками</a>.</td><td>Способи ведення записів та випадки невизначеності, без оцінки частоти.</td></tr>
         <tr><th scope="row">Mobbin</th><td>Екрани сторонніх застосунків, переглянуті через підключення засновниці. <a href="notes/05-benchmark.md">Метод і джерела бенчмарку</a>.</td><td>Приклади UX-механізмів; це не проходження акаунтів у цих застосунках.</td></tr>
         <tr><th scope="row">Бриф</th><td><a href="../Codex.md">Codex.md</a> — цілі, аудиторія та продуктові рішення.</td><td>Основа оцінки й гіпотез, а не факт про конкурентів.</td></tr>
       </tbody></table></div>

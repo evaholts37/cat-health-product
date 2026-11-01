@@ -14,5 +14,6 @@
 - [Висновки дослідження](research/research.md) і [HTML-сторінка](research/research.html)
 - [Персони](personas.md), [JTBD](jtbd.md) і [HTML-сторінка персон](personas.html)
 - [Знімки екранів](research/screens/)
+- [Ручні проходження конкурентів 1 листопада 2026 року](research/notes/09-android-flows-2026-11-01.md)
 
 **Адреси:** репозиторій — https://github.com/evaholts37/cat-health-product; GitHub Pages — https://evaholts37.github.io/cat-health-product/.
