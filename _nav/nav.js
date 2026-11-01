@@ -19,7 +19,7 @@
 
   const heading = document.createElement("div");
   heading.className = "repo-nav-heading";
-  heading.textContent = "Здоров'я котів";
+  heading.textContent = "Догляд за улюбленцями";
   nav.appendChild(heading);
 
   function makePages(pages) {
