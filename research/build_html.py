@@ -273,7 +273,7 @@ html = """<!doctype html>
       <h1>Наступна дія має бути очевидною.</h1>
       <p class="lead">Дослідження догляду за котами й собаками: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
       <p class="research-meta">Стан матеріалів: <time datetime="2026-11-01">1 листопада 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>.</p>
-      <div class="mast-links"><a href="research.md">Повний звіт у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
+      <div class="mast-links"><a href="../personas.html">Персони та JTBD ↗</a><a href="research.md">Повний звіт у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
       <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Відгуки й форуми</span><span>Mobbin</span></div>
       <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a></nav>
     </header>
