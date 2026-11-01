@@ -63,7 +63,7 @@ body.repo-has-nav {
   outline-offset: 2px;
 }
 
-#repo-nav a[aria-current="page"] {
+#repo-nav a[aria-current] {
   background: #e2e7ed;
   color: #17212c;
   font-weight: 650;

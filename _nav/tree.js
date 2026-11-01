@@ -9,13 +9,13 @@ window.REPO_NAV_TREE = [
   {
     label: "Ресерч",
     pages: [
-      { title: "Висновки дослідження", path: "research/research.html", children: [] }
+      { title: "Висновки дослідження", path: "research/research.html#ресерч", children: [] }
     ]
   },
   {
     label: "Персони",
     pages: [
-      { title: "Персони та JTBD", path: "personas.html", children: [] }
+      { title: "Персони та JTBD", path: "research/research.html#персони", children: [] }
     ]
   }
 ];

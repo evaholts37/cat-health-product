@@ -12,7 +12,6 @@
     return parsed.origin + path;
   }
 
-  const currentPage = pageKey(window.location.href);
   const nav = document.createElement("nav");
   nav.id = "repo-nav";
   nav.setAttribute("aria-label", "Навігація репозиторієм");
@@ -31,9 +30,6 @@
       const link = document.createElement("a");
       link.href = new URL(page.path, root).href;
       link.textContent = page.title;
-      if (pageKey(link.href) === currentPage) {
-        link.setAttribute("aria-current", "page");
-      }
       item.appendChild(link);
       if (page.children && page.children.length) {
         item.appendChild(makePages(page.children));
@@ -58,6 +54,24 @@
   }
   nav.appendChild(branches);
 
+  function updateCurrent() {
+    const currentPage = pageKey(window.location.href);
+    const targetId = decodeURIComponent(window.location.hash.slice(1));
+    const target = targetId ? document.getElementById(targetId) : null;
+    const sectionId = target?.closest("section")?.id || targetId;
+    const personaArea = ["персони", "jobs", "матриця"].includes(sectionId);
+    for (const link of nav.querySelectorAll("a")) {
+      link.removeAttribute("aria-current");
+      if (pageKey(link.href) !== currentPage) continue;
+      const linkHash = decodeURIComponent(new URL(link.href).hash);
+      if (!linkHash || (linkHash === "#персони" && personaArea) || (linkHash === "#ресерч" && !personaArea)) {
+        link.setAttribute("aria-current", linkHash ? "location" : "page");
+      }
+    }
+  }
+
   document.body.classList.add("repo-has-nav");
   document.body.insertBefore(nav, document.body.firstChild);
+  updateCurrent();
+  window.addEventListener("hashchange", updateCurrent);
 })();

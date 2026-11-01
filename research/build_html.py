@@ -2,11 +2,16 @@
 
 from html import escape, unescape
 from pathlib import Path
+import posixpath
 import re
+import sys
 from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT.parent))
+from build_personas import render_persona_sections
+
 source = (ROOT / "research.md").read_text(encoding="utf-8")
 COMPETITOR_GROUPS = {
     "DogCatApp": "Хард",
@@ -151,19 +156,33 @@ for number, (title, section_id, label) in enumerate(sections_to_show, 1):
         raise ValueError(f"Missing research section: {title}")
     parts.append(f'<section id="{section_id}" class="report-section" aria-labelledby="heading-{section_id}"><div class="section-title"><span class="section-number">{number:02d}</span><h2 id="heading-{section_id}">{label}</h2></div>{section_html[title]}{gallery if title == "КОНКУРЕНТИ" else ""}</section>')
 
+
+def local_persona_link(match: re.Match[str]) -> str:
+    target = match.group(1)
+    if target.startswith(("http://", "https://", "#", "mailto:")):
+        return match.group(0)
+    parsed = urlsplit(target)
+    relative = posixpath.relpath(parsed.path, "research")
+    suffix = (f"?{parsed.query}" if parsed.query else "") + (f"#{parsed.fragment}" if parsed.fragment else "")
+    return f'href="{relative}{suffix}"'
+
+
+persona_sections = re.sub(r'href="([^"]+)"', local_persona_link, render_persona_sections())
+
 html = """<!doctype html>
 <html lang="uk">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Дослідження MVP · Догляд за котами й собаками</title>
-  <meta name="description" content="Конкуренти, відгуки, форуми, власні проходження та гіпотези для застосунку догляду за котами й собаками.">
+  <title>Ресерч, персони та JTBD · Догляд за котами й собаками</title>
+  <meta name="description" content="Ресерч, поведінкові персони, jobs і JTBD-матриця для застосунку догляду за котами й собаками.">
   <link rel="stylesheet" href="../_nav/nav.css">
+  <link rel="stylesheet" href="personas.css">
   <style>
     :root { --bg: #0d151b; --panel: #14212a; --line: #2a3b44; --text: #e9f0ed; --muted: #aabbbd; --accent: #9fe4ce; --warm: #edc48a; }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: auto; }
     body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
     body.repo-has-nav { padding-left: 240px; }
     a { color: var(--accent); text-underline-offset: .18em; }
@@ -174,7 +193,7 @@ html = """<!doctype html>
     #repo-nav .repo-nav-branch { color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
     #repo-nav a { color: var(--muted); }
     #repo-nav a:hover, #repo-nav a:focus-visible { background: #21333d; color: var(--text); }
-    #repo-nav a[aria-current="page"] { background: #214238; color: #d7f8e9; }
+    #repo-nav a[aria-current] { background: #214238; color: #d7f8e9; }
     .page { max-width: 1450px; margin: auto; padding: 0 clamp(22px, 5vw, 80px) 96px; }
     .masthead { padding: clamp(55px, 8vw, 118px) 0 68px; border-bottom: 1px solid var(--line); }
     h1 { max-width: 900px; margin: 0; font-size: clamp(2.8rem, 6.5vw, 5.6rem); line-height: 1.04; font-weight: 650; letter-spacing: -.065em; }
@@ -207,7 +226,7 @@ html = """<!doctype html>
     ol { padding-left: 1.4em; margin: 24px 0 32px; }
     li { padding-left: .35em; margin: 0 0 17px; }
     li::marker { color: var(--warm); font-weight: 700; }
-    .table-wrap { width: 100%; margin: 25px 0 42px; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: #101d25; scrollbar-color: #59726d transparent; }
+    .table-wrap { width: 100%; margin: 25px 0 42px; padding: 8px; overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: #101d25; scrollbar-color: #59726d transparent; }
     table { width: 100%; min-width: 780px; border-collapse: collapse; font-size: .9rem; line-height: 1.55; }
     th, td { padding: 19px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
     tr > :last-child { border-right: 0; }
@@ -269,13 +288,13 @@ html = """<!doctype html>
 </head>
 <body class="research-page">
   <main class="page">
-    <header class="masthead">
+    <header class="masthead" id="ресерч">
       <h1>Наступна дія має бути очевидною.</h1>
       <p class="lead">Дослідження догляду за котами й собаками: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
       <p class="research-meta">Стан матеріалів: <time datetime="2026-11-01">1 листопада 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>.</p>
-      <div class="mast-links"><a href="../personas.html">Персони та JTBD ↗</a><a href="research.md">Повний звіт у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
+      <div class="mast-links"><a href="#персони">Персони та JTBD ↓</a><a href="research.md">Ресерч у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
       <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Відгуки й форуми</span><span>Mobbin</span></div>
-      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a></nav>
+      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a><a href="#персони">Персони</a><a href="#jobs">Jobs</a><a href="#матриця">JTBD-матриця</a></nav>
     </header>
     <section id="звідки-дані" class="source-section" aria-labelledby="sources-heading">
       <h2 id="sources-heading">Звідки дані</h2>
@@ -290,11 +309,12 @@ html = """<!doctype html>
       </tbody></table></div>
     </section>
     REPORT
-    <footer class="footer"><span>Джерела й межі висновків наведені біля кожного спостереження.</span><a href="#конкуренти">Повернутися до початку ↑</a></footer>
+    PERSONAS
+    <footer class="footer"><span>Джерела й межі висновків наведені біля кожного спостереження.</span><a href="#ресерч">Повернутися до початку ↑</a></footer>
   </main>
 </body>
 </html>
-""".replace("    REPORT", "\n".join(parts))
+""".replace("    REPORT", "\n".join(parts)).replace("    PERSONAS", persona_sections)
 
 (ROOT / "research.html").write_text(html, encoding="utf-8")
 missing = [

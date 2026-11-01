@@ -11,8 +11,7 @@
 - [Продуктовий бриф і правила репозиторію](Codex.md)
 - [Стартова сторінка](index.html)
 - [Дерево HTML-сторінок](./_nav/tree.js)
-- [Висновки дослідження](research/research.md) і [HTML-сторінка](research/research.html)
-- [Персони](personas.md), [JTBD](jtbd.md) і [HTML-сторінка персон](personas.html)
+- [Висновки дослідження](research/research.md), [персони](personas.md) і [JTBD](jtbd.md) — на [одній HTML-сторінці](research/research.html)
 - [Знімки екранів](research/screens/)
 - [Ручні проходження конкурентів 1 листопада 2026 року](research/notes/09-android-flows-2026-11-01.md)
 
