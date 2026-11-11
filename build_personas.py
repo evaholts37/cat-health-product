@@ -104,7 +104,7 @@ if any(len(row) != 6 for row in matrix_cells):
 matrix_head = "".join(f'<th scope="col" role="columnheader" id="jtbd-col-{index}">{inline(cell)}</th>' for index, cell in enumerate(matrix_cells[0]))
 matrix_body_html = "\n".join(
     f'<tr role="row"><th scope="row" role="rowheader" id="jtbd-row-{row_index}">{inline(row[0])}</th>' + "".join(
-        f'<td role="cell" headers="jtbd-row-{row_index} jtbd-col-{index}"><span class="matrix-cell-label" aria-hidden="true">{inline(matrix_cells[0][index])}</span><span class="matrix-cell-value">{inline(cell)}</span></td>'
+        f'<td role="cell" headers="jtbd-row-{row_index} jtbd-col-{index}"><span class="matrix-cell-label" aria-hidden="true" hidden>{inline(matrix_cells[0][index])}</span><span class="matrix-cell-value">{inline(cell)}</span></td>'
         for index, cell in enumerate(row)
         if index > 0
     ) + "</tr>"

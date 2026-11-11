@@ -1,6 +1,7 @@
 """Build the static, source-linked research page from research.md."""
 
 from html import escape, unescape
+from hashlib import sha256
 from pathlib import Path
 import posixpath
 import re
@@ -175,6 +176,7 @@ def local_persona_link(match: re.Match[str]) -> str:
 persona_sections = re.sub(r'href="([^"]+)"', local_persona_link, render_persona_sections())
 ia_sections, ia_styles, ia_script = render_embedded_ia()
 ia_sections = re.sub(r'href="([^"]+)"', local_persona_link, ia_sections)
+persona_css_version = sha256((ROOT / "personas.css").read_text(encoding="utf-8").encode("utf-8")).hexdigest()[:12]
 
 html = """<!doctype html>
 <html lang="uk">
@@ -185,7 +187,7 @@ html = """<!doctype html>
   <title>Ресерч, персони, JTBD та IA · Догляд за котами й собаками</title>
   <meta name="description" content="Ресерч, персони, JTBD та інформаційна архітектура: дерево екранів, user flows і матриця трасування.">
   <link rel="stylesheet" href="../_nav/nav.css">
-  <link rel="stylesheet" href="personas.css">
+  <link rel="stylesheet" href="personas.css?v=PERSONAS_CSS_VERSION">
   <style>
     :root { --bg: #0d151b; --panel: #14212a; --line: #2a3b44; --text: #e9f0ed; --muted: #aabbbd; --accent: #9fe4ce; --warm: #edc48a; }
     * { box-sizing: border-box; }
@@ -326,7 +328,7 @@ html = """<!doctype html>
   <script type="module">IA_SCRIPT</script>
 </body>
 </html>
-""".replace("    REPORT", "\n".join(parts)).replace("    PERSONAS", persona_sections).replace("    IA_CONTENT", ia_sections).replace("IA_STYLES", ia_styles).replace("IA_SCRIPT", ia_script)
+""".replace("    REPORT", "\n".join(parts)).replace("    PERSONAS", persona_sections).replace("    IA_CONTENT", ia_sections).replace("IA_STYLES", ia_styles).replace("IA_SCRIPT", ia_script).replace("PERSONAS_CSS_VERSION", persona_css_version)
 
 (ROOT / "research.html").write_text(html, encoding="utf-8")
 missing = [
