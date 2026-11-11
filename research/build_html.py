@@ -135,6 +135,9 @@ gallery = """
   <figure><a href="screens/own/dogcat-three-pet-calendar-20261101.png"><img src="screens/own/dogcat-three-pet-calendar-20261101.png" alt="DogCatApp: календар і вибір одного з трьох профілів" loading="lazy"></a><figcaption><b>DogCatApp</b><span>1 листопада · Вибір тварини</span></figcaption></figure>
   <figure><a href="screens/own/pet-health-two-pet-activity-20261101.png"><img src="screens/own/pet-health-two-pet-activity-20261101.png" alt="Pet Health: спільні лічильники та дві картки тварин" loading="lazy"></a><figcaption><b>Pet Health</b><span>1 листопада · Дві тварини</span></figcaption></figure>
   <figure><a href="screens/own/pawme-ai-species-selection-20261101.png"><img src="screens/own/pawme-ai-species-selection-20261101.png" alt="PawMe: автоматично вибрано собаку для фото кота; вид можна виправити" loading="lazy"></a><figcaption><b>PawMe</b><span>1 листопада · Ручне виправлення виду</span></figcaption></figure>
+  <figure><a href="screens/own/dogcat-notifications-20261111.png"><img src="screens/own/dogcat-notifications-20261111.png" alt="DogCatApp: системний сигнал про медикамент для Мурка та останнє нагадування" loading="lazy"></a><figcaption><b>DogCatApp · E11-1</b><span>11 листопада · Сповіщення</span></figcaption></figure>
+  <figure><a href="screens/own/dogcat-late-20261111.png"><img src="screens/own/dogcat-late-20261111.png" alt="DogCatApp: медикамент для Мурка зі станом Запізнення та діями Пропустити і Готово" loading="lazy"></a><figcaption><b>DogCatApp · E11-2</b><span>11 листопада · Запізнення</span></figcaption></figure>
+  <figure><a href="screens/own/dogcat-skipped-20261111.png"><img src="screens/own/dogcat-skipped-20261111.png" alt="DogCatApp: той самий медикамент зі станом Пропущено та діями Видалити і Готово" loading="lazy"></a><figcaption><b>DogCatApp · E11-3</b><span>11 листопада · Пропущено</span></figcaption></figure>
 </div>
 """
 
@@ -150,6 +153,7 @@ sections_to_show = [
     ("Доресерч після персон", "доресерч-після-персон", "Доресерч після персон"),
     ("Ручне проходження конкурентів 1 листопада", "ручне-проходження-конкурентів-1-листопада", "Ручне проходження 1 листопада"),
     ("Перевірка гіпотез JTBD у відкритих джерелах", "перевірка-гіпотез-jtbd-у-відкритих-джерелах", "Перевірка гіпотез JTBD"),
+    ("Уточнення засновниці 11 листопада", "уточнення-засновниці-11-листопада", "Уточнення засновниці 11 листопада"),
 ]
 for number, (title, section_id, label) in enumerate(sections_to_show, 1):
     if title not in section_html:
@@ -291,14 +295,14 @@ html = """<!doctype html>
     <header class="masthead" id="ресерч">
       <h1>Наступна дія має бути очевидною.</h1>
       <p class="lead">Дослідження догляду за котами й собаками: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
-      <p class="research-meta">Стан матеріалів: <time datetime="2026-11-01">1 листопада 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>.</p>
+      <p class="research-meta">Стан матеріалів: <time datetime="2026-11-11">11 листопада 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>, реєстр сутностей і статусів — <a href="../sitemap.md">sitemap.md</a>.</p>
       <div class="mast-links"><a href="#персони">Персони та JTBD ↓</a><a href="research.md">Ресерч у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
-      <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Відгуки й форуми</span><span>Mobbin</span></div>
-      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a><a href="#персони">Персони</a><a href="#jobs">Jobs</a><a href="#матриця">JTBD-матриця</a></nav>
+      <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Відгуки й форуми</span><span>Mobbin</span><span>Досвід засновниці</span></div>
+      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a><a href="#уточнення-засновниці-11-листопада">Уточнення 11 листопада</a><a href="#персони">Персони</a><a href="#jobs">Jobs</a><a href="#матриця">JTBD-матриця</a></nav>
     </header>
     <section id="звідки-дані" class="source-section" aria-labelledby="sources-heading">
       <h2 id="sources-heading">Звідки дані</h2>
-      <p>Спостереження з тестових акаунтів відокремлено від відкритих джерел і прикладів Mobbin. Продуктовий бриф задає цілі та рішення, але не є доказом про ринок.</p>
+      <p>Спостереження з тестових акаунтів відокремлено від відкритих джерел і прикладів Mobbin. Особистий досвід засновниці з котом і пояснення до скриншотів позначені окремо. Продуктовий бриф задає цілі та рішення, але не є доказом про ринок.</p>
       <div class="table-wrap" tabindex="0" aria-label="Походження матеріалів"><table class="source-table"><thead><tr><th scope="col">Позначка</th><th scope="col">Джерело</th><th scope="col">Як використано</th></tr></thead><tbody>
         <tr><th scope="row">Власне проходження</th><td>Записи екрана із тестових акаунтів, надані засновницею; <a href="#екрани-дослідження">опубліковані кадри</a> збережені у <code>screens/own/</code>. Введені дані вигадані. <a href="notes/06-android-flows.md">Флоу 29 жовтня</a>, <a href="notes/09-android-flows-2026-11-01.md">флоу 1 листопада</a>, <a href="notes/07-todoist-own.md">Todoist</a>.</td><td>Перевірені екрани й кроки сценарію. Коди запрошень та системні списки контактів не опубліковано.</td></tr>
         <tr><th scope="row">Публічне</th><td>Сайти, офіційні довідки, сторінки застосунків, відгуки й демо-відео без входу. Джерела перелічено у <a href="notes/03-competitors.md">відборі</a> та <a href="notes/04-matrix.md">матриці</a>; приклад — <a href="screens/felivo-detail-public-mobile.png">публічний кадр Felivo</a>.</td><td>Факти про заявлені функції та доступні без логіну екрани.</td></tr>
@@ -306,6 +310,7 @@ html = """<!doctype html>
         <tr><th scope="row">Форуми</th><td>Першоособові дописи про догляд за <a href="notes/cat-care-forums.md">котами</a> і <a href="notes/dog-care-comparison.md">собаками</a>.</td><td>Способи ведення записів та випадки невизначеності, без оцінки частоти.</td></tr>
         <tr><th scope="row">Mobbin</th><td>Екрани сторонніх застосунків, переглянуті через підключення засновниці. <a href="notes/05-benchmark.md">Метод і джерела бенчмарку</a>.</td><td>Приклади UX-механізмів; це не проходження акаунтів у цих застосунках.</td></tr>
         <tr><th scope="row">Бриф</th><td><a href="../Codex.md">Codex.md</a> — цілі, аудиторія та продуктові рішення.</td><td>Основа оцінки й гіпотез, а не факт про конкурентів.</td></tr>
+        <tr><th scope="row">Засновниця · 11 листопада</th><td><a href="notes/11-founder-weight-and-statuses-2026-11-11.md">Джерело F1–F3</a>: досвід давання ліків коту, уточнення необов’язкових даних профілю; три різні кадри DogCatApp — <a href="screens/own/dogcat-notifications-20261111.png">сповіщення</a>, <a href="screens/own/dogcat-late-20261111.png">запізнення</a>, <a href="screens/own/dogcat-skipped-20261111.png">пропущено</a>.</td><td>Досвід однієї власниці, видимі стани конкурента й окремо пояснення до проходження. Погоджені вимоги наведено в <a href="#уточнення-засновниці-11-листопада">уточненні</a>; вони не доводять реалізації нашого продукту.</td></tr>
       </tbody></table></div>
     </section>
     REPORT

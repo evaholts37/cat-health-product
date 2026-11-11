@@ -17,5 +17,11 @@ window.REPO_NAV_TREE = [
     pages: [
       { title: "Персони та JTBD", path: "research/research.html#персони", children: [] }
     ]
+  },
+  {
+    label: "Структура",
+    pages: [
+      { title: "Карта екранів і flows", path: "ia.html", children: [] }
+    ]
   }
 ];

@@ -73,9 +73,9 @@ if not main_quote:
     raise ValueError("Missing main job")
 main_explanation = main[main_quote.end():].strip()
 related = section(JTBD, "Related jobs на шляху до main job")
-related_items = re.findall(r"(?m)^([1-5])\. (.+)$", related)
-if len(related_items) != 5:
-    raise ValueError("Expected five related jobs")
+related_items = re.findall(r"(?m)^([1-6])\. (.+)$", related)
+if len(related_items) != 6:
+    raise ValueError("Expected six related jobs")
 
 
 def job_cards(items: list[tuple[str, str]], prefix: str) -> str:
@@ -96,8 +96,8 @@ hypotheses = bullet_items("Гіпотези, які не входять до о�
 matrix_body = section(JTBD, "JTBD-матриця")
 matrix_before_conclusion = matrix_body.split("### Висновок для ядра MVP", 1)[0].strip()
 matrix_rows = [line.strip().strip("|") for line in matrix_before_conclusion.splitlines() if line.startswith("|")]
-if len(matrix_rows) != 16:
-    raise ValueError(f"Expected matrix header, separator and 14 jobs; got {len(matrix_rows)} rows")
+if len(matrix_rows) != 17:
+    raise ValueError(f"Expected matrix header, separator and 15 jobs; got {len(matrix_rows)} rows")
 matrix_cells = [[cell.strip() for cell in row.split("|")] for row in matrix_rows]
 if any(len(row) != 6 for row in matrix_cells):
     raise ValueError("JTBD matrix needs exactly six columns")
@@ -128,7 +128,7 @@ def render_persona_sections() -> str:
     <section id="jobs" class="report-section" aria-labelledby="jobs-heading">
       <div class="section-title"><h2 id="jobs-heading">Ієрархія jobs</h2></div>
       <div class="main-job"><span class="eyebrow">MAIN JOB · J0</span><blockquote>{inline(main_quote.group(1))}</blockquote>{paragraphs(main_explanation)}</div>
-      <div class="job-group"><h3>Related jobs · J1–J5</h3><div class="job-grid">{job_cards(related_items, 'J')}</div></div>
+      <div class="job-group"><h3>Related jobs · J1–J6</h3><div class="job-grid">{job_cards(related_items, 'J')}</div></div>
       <div class="job-group"><h3>Emotional jobs · E1–E2</h3><div class="job-grid">{job_cards(emotional, 'E')}</div></div>
       <div class="job-group"><h3>Social jobs · S1–S2</h3><div class="job-grid">{job_cards(social, 'S')}</div></div>
       <div class="job-group hypothesis-group"><h3>Перевірювані jobs · H1–H4</h3><p class="section-intro">Частину потреб підтверджено окремими свідченнями. Позначка [?] лишається там, де даних про людей або наше рішення бракує.</p><div class="job-grid">{job_cards(hypotheses, 'H')}</div></div>
@@ -139,7 +139,7 @@ def render_persona_sections() -> str:
       <div class="matrix-explainer">{paragraphs(matrix_intro)}</div>
       <p class="legend"><span class="unknown">[?]</span> важливість або стан не встановлено <span class="hypothesis-label">гіпотеза</span> потреба чи рішення без достатнього підтвердження.</p>
       <div class="table-wrap" tabindex="0" role="region" aria-label="JTBD-матриця, прокручується горизонтально">
-        <table><caption>Усі 14 jobs із jtbd.md · важливість для трьох персон, функція продукту й конкуренти</caption><thead><tr>{matrix_head}</tr></thead><tbody>{matrix_body_html}</tbody></table>
+        <table><caption>Усі 15 jobs із jtbd.md · важливість для трьох персон, функція продукту й конкуренти</caption><thead><tr>{matrix_head}</tr></thead><tbody>{matrix_body_html}</tbody></table>
       </div>
       <div class="matrix-note">{paragraphs(matrix_note)}</div>
       <div class="mvp"><h3>Висновок для ядра MVP</h3>{paragraphs(matrix_conclusion)}</div>
