@@ -11,6 +11,7 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent))
 from build_personas import render_persona_sections
+from build_ia import render_embedded_ia
 
 source = (ROOT / "research.md").read_text(encoding="utf-8")
 COMPETITOR_GROUPS = {
@@ -172,6 +173,8 @@ def local_persona_link(match: re.Match[str]) -> str:
 
 
 persona_sections = re.sub(r'href="([^"]+)"', local_persona_link, render_persona_sections())
+ia_sections, ia_styles, ia_script = render_embedded_ia()
+ia_sections = re.sub(r'href="([^"]+)"', local_persona_link, ia_sections)
 
 html = """<!doctype html>
 <html lang="uk">
@@ -179,8 +182,8 @@ html = """<!doctype html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Ресерч, персони та JTBD · Догляд за котами й собаками</title>
-  <meta name="description" content="Ресерч, поведінкові персони, jobs і JTBD-матриця для застосунку догляду за котами й собаками.">
+  <title>Ресерч, персони, JTBD та IA · Догляд за котами й собаками</title>
+  <meta name="description" content="Ресерч, персони, JTBD та інформаційна архітектура: дерево екранів, user flows і матриця трасування.">
   <link rel="stylesheet" href="../_nav/nav.css">
   <link rel="stylesheet" href="personas.css">
   <style>
@@ -198,6 +201,7 @@ html = """<!doctype html>
     #repo-nav a { color: var(--muted); }
     #repo-nav a:hover, #repo-nav a:focus-visible { background: #21333d; color: var(--text); }
     #repo-nav a[aria-current] { background: #214238; color: #d7f8e9; }
+    #repo-nav .repo-nav-pages .repo-nav-pages { border-color: var(--line); }
     .page { max-width: 1450px; margin: auto; padding: 0 clamp(22px, 5vw, 80px) 96px; }
     .masthead { padding: clamp(55px, 8vw, 118px) 0 68px; border-bottom: 1px solid var(--line); }
     h1 { max-width: 900px; margin: 0; font-size: clamp(2.8rem, 6.5vw, 5.6rem); line-height: 1.04; font-weight: 650; letter-spacing: -.065em; }
@@ -287,6 +291,7 @@ html = """<!doctype html>
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   </style>
+  <style>IA_STYLES</style>
   <script src="../_nav/tree.js" defer></script>
   <script id="repo-nav-script" src="../_nav/nav.js" data-root="../" defer></script>
 </head>
@@ -296,9 +301,9 @@ html = """<!doctype html>
       <h1>Наступна дія має бути очевидною.</h1>
       <p class="lead">Дослідження догляду за котами й собаками: що вже зроблено, який препарат давали востаннє і що потрібно запланувати далі.</p>
       <p class="research-meta">Стан матеріалів: <time datetime="2026-11-11">11 листопада 2026 року</time>. Текст — <a href="research.md">research/research.md</a>, продуктовий бриф — <a href="../Codex.md">Codex.md</a>, реєстр сутностей і статусів — <a href="../sitemap.md">sitemap.md</a>.</p>
-      <div class="mast-links"><a href="#персони">Персони та JTBD ↓</a><a href="research.md">Ресерч у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
+      <div class="mast-links"><a href="#персони">Персони та JTBD ↓</a><a href="#структура">Структура та flows ↓</a><a href="research.md">Ресерч у Markdown ↗</a><a href="../Codex.md">Продуктовий бриф ↗</a></div>
       <div class="provenance" aria-label="Типи джерел"><span>Власні тестові проходження</span><span>Публічні сторінки</span><span>Відгуки й форуми</span><span>Mobbin</span><span>Досвід засновниці</span></div>
-      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a><a href="#уточнення-засновниці-11-листопада">Уточнення 11 листопада</a><a href="#персони">Персони</a><a href="#jobs">Jobs</a><a href="#матриця">JTBD-матриця</a></nav>
+      <nav class="jump" aria-label="Розділи сторінки"><a href="#звідки-дані">Звідки дані</a><a href="#конкуренти">Конкуренти</a><a href="#бенчмарк">Бенчмарк</a><a href="#патерни">Патерни</a><a href="#висновки">Висновки</a><a href="#відгуки">Відгуки</a><a href="#форуми">Форуми</a><a href="#собаки">Коти й собаки</a><a href="#доресерч-після-персон">Доресерч</a><a href="#ручне-проходження-конкурентів-1-листопада">Ручне проходження</a><a href="#перевірка-гіпотез-jtbd-у-відкритих-джерелах">Гіпотези JTBD</a><a href="#уточнення-засновниці-11-листопада">Уточнення 11 листопада</a><a href="#персони">Персони</a><a href="#jobs">Jobs</a><a href="#матриця">JTBD-матриця</a><a href="#структура">Структура та flows</a></nav>
     </header>
     <section id="звідки-дані" class="source-section" aria-labelledby="sources-heading">
       <h2 id="sources-heading">Звідки дані</h2>
@@ -315,11 +320,13 @@ html = """<!doctype html>
     </section>
     REPORT
     PERSONAS
+    IA_CONTENT
     <footer class="footer"><span>Джерела й межі висновків наведені біля кожного спостереження.</span><a href="#ресерч">Повернутися до початку ↑</a></footer>
   </main>
+  <script type="module">IA_SCRIPT</script>
 </body>
 </html>
-""".replace("    REPORT", "\n".join(parts)).replace("    PERSONAS", persona_sections)
+""".replace("    REPORT", "\n".join(parts)).replace("    PERSONAS", persona_sections).replace("    IA_CONTENT", ia_sections).replace("IA_STYLES", ia_styles).replace("IA_SCRIPT", ia_script)
 
 (ROOT / "research.html").write_text(html, encoding="utf-8")
 missing = [

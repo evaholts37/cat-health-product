@@ -21,7 +21,10 @@ window.REPO_NAV_TREE = [
   {
     label: "Структура",
     pages: [
-      { title: "Карта екранів і flows", path: "ia.html", children: [] }
+      {
+        title: "Карта екранів і flows", path: "research/research.html#структура",
+        children: [{ title: "Окремий знімок IA", path: "ia.html", children: [] }]
+      }
     ]
   }
 ];

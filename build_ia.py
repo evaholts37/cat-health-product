@@ -151,7 +151,7 @@ if(mermaid) {
       canvas.innerHTML = svg;
       const rendered = canvas.querySelector('svg');
       rendered.setAttribute('role','img');
-      rendered.setAttribute('aria-label', flow.querySelector('h3').textContent.trim());
+      rendered.setAttribute('aria-label', flow.querySelector('.flow-title').textContent.trim());
       if(bindFunctions) bindFunctions(canvas);
       flow.querySelector('.render-status').hidden = true;
       controls(flow, rendered);
@@ -246,7 +246,7 @@ def build():
         key = job["id"]
         label = "MAIN JOB · J0" if key == "J0" else key
         flow_html.append(f'''<article class="flow" id="flow-{key}" aria-labelledby="title-{key}">
-<h3 id="title-{key}"><span class="job-id">{label}</span>{html.escape(job["title"])}</h3>
+<h3 class="flow-title" id="title-{key}"><span class="job-id">{label}</span>{html.escape(job["title"])}</h3>
 <div class="prose">{markdown(job["before"])}</div>
 <div class="diagram" aria-label="Діаграма {key}">
 <div class="diagram-toolbar" role="group" aria-label="Масштаб діаграми {key}">
@@ -302,6 +302,46 @@ def build():
 <footer><p>Знімок побудовано з <a href="sitemap.md">sitemap.md</a> та <a href="flows.md">flows.md</a>. Дослідницькі гіпотези й технічні межі збережені у джерелах.</p><a href="#content">На початок сторінки</a></footer>
 </main><script type="module">{JS}</script></body></html>
 '''
+
+
+def render_embedded_ia():
+    """Reuse the snapshot inside research, with isolated styles, IDs and heading levels."""
+    snapshot = build()
+    content = snapshot.split('<main id="content" class="page">', 1)[1].split('<footer>', 1)[0]
+    ids = {value: f"ia-{value}" for value in re.findall(r'\bid="([^"]+)"', content)}
+    content = re.sub(r'\bid="([^"]+)"', lambda m: f'id="{ids[m[1]]}"', content)
+    content = re.sub(r'href="#([^"]+)"', lambda m: f'href="#{ids.get(m[1], m[1])}"', content)
+    content = re.sub(r'(aria-labelledby|aria-describedby)="([^"]+)"',
+                     lambda m: f'{m[1]}="{" ".join(ids.get(v, v) for v in m[2].split())}"', content)
+    content = re.sub(r'(<\/?h)([1-4])\b', lambda m: m[1] + str(int(m[2])+1), content)
+    content = content.replace('<h2>Структура продукту</h2>', '<h2 id="ia-heading">Структура продукту</h2>', 1)
+
+    def scope_rule(match):
+        selectors, declarations = match.groups()
+        scoped = []
+        for selector in selectors.split(','):
+            selector = selector.strip()
+            if selector == ':root':
+                scoped.append('#ia-content')
+            elif not re.match(r'^(?:html|body|#repo-nav|\.page|\.skip-link)(?:\b|[\s:.>])', selector):
+                selector = re.sub(r'\bh([1-4])\b', lambda m: f'h{int(m[1])+1}', selector)
+                selector = re.sub(r'#([\w-]+)', lambda m: '#' + ids.get(m[1], m[1]), selector)
+                scoped.append('#ia-content ' + selector)
+        return ','.join(scoped) + '{' + declarations + '}' if scoped else ''
+
+    # Only leaf rules are rewritten; enclosing @media blocks remain intact.
+    styles = re.sub(r'([^{}]+)\{([^{}]*)\}', scope_rule, CSS)
+    styles += '''
+#ia-content{min-width:0}
+#ia-content>header h2{font-size:clamp(1.8rem,3vw,2.5rem);max-width:none;letter-spacing:-.025em}
+#ia-content>section{padding-top:44px;margin-top:44px;border-top:1px solid var(--line);min-width:0}
+#ia-content>section>h3{font-size:clamp(1.5rem,2.5vw,2rem)}
+#ia-content .site-tree>li{margin-top:0}
+#ia-content .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+'''
+    body = f'<section id="структура" class="report-section" data-repo-nav-section="структура" aria-labelledby="ia-heading"><div id="ia-content">{content}</div></section>'
+    script = JS.replace("document.querySelectorAll('.flow')", "document.querySelectorAll('#ia-content .flow')")
+    return body, styles, script
 
 
 if __name__ == "__main__":

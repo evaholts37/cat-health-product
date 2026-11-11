@@ -13,10 +13,10 @@
 - [Продуктовий бриф і правила репозиторію](Codex.md)
 - [Стартова сторінка](index.html)
 - [Дерево HTML-сторінок](./_nav/tree.js)
-- [Висновки дослідження](research/research.md), [персони](personas.md) і [JTBD](jtbd.md) — на [одній HTML-сторінці](research/research.html)
+- [Висновки дослідження](research/research.md), [персони](personas.md), [JTBD](jtbd.md) та [структура з flows](research/research.html#структура) — на [одній HTML-сторінці](research/research.html)
 - [Сутності, реєстр статусів та екранів](sitemap.md#сутності)
 - [MAIN JOB і flows J1–J6](flows.md)
-- [Знімок IA: дерево екранів, Mermaid-flows і матриця трасування](ia.html) — з [карти екранів](sitemap.md) і [маршрутів](flows.md); оновлення: `python -B build_ia.py`.
+- [IA на спільній сторінці](research/research.html#структура) та [окремий знімок](ia.html): дерево екранів, Mermaid-flows і матриця трасування з [карти екранів](sitemap.md) і [маршрутів](flows.md); оновлення: `python -B build_ia.py`, потім `python -B research/build_html.py`.
 - [Backlog S1/S2 після ядра MVP](backlog.md)
 - [Погоджені виправлення аудиту F6](research/notes/13-approved-flow-audit-fixes-2026-11-12.md)
 - [Рішення F5: редагування, корекція й новий план](research/notes/12-edit-correct-reschedule-2026-11-12.md#f5-погоджені-правила-нашого-продукту)

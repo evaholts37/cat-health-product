@@ -162,7 +162,7 @@
 
 Карта екранів — sitemap.md, маршрути — flows.md.
 
-`ia.html` — знімок IA; після змін `sitemap.md` або `flows.md` перебудувати через `python -B build_ia.py` і перевірити актуальність через `python -B build_ia.py --check`.
+IA є в `research/research.html#структура` та окремому `ia.html`; після змін `sitemap.md` або `flows.md` виконати `python -B build_ia.py`, потім `python -B research/build_html.py`; актуальність знімка перевірити через `python -B build_ia.py --check`.
 
 - Імена екранів, персон, компонентів, токенів і ключів тексту не вигадуються в промптах, а беруться з реєстрів: екрани, головний і контрастний — `sitemap.md`; персони — `personas.md` (primary позначена); компоненти — `design-system/inventory.md`, з уроку 9 — `design-system/docs/`; ролі кольору — `design-system/tokens.css`; ключі тексту — `microcopy.md`; сторінки — `_nav/tree.js`. Реєстри, яких ще немає, створюються на відповідному уроці.
 - Якщо промпт описує річ роллю («головний екран», «primary-персона»), знайди її ім'я у відповідному реєстрі.

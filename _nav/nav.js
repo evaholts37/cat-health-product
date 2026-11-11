@@ -58,13 +58,14 @@
     const currentPage = pageKey(window.location.href);
     const targetId = decodeURIComponent(window.location.hash.slice(1));
     const target = targetId ? document.getElementById(targetId) : null;
-    const sectionId = target?.closest("section")?.id || targetId;
+    const sectionId = target?.closest("[data-repo-nav-section]")?.dataset.repoNavSection || target?.closest("section")?.id || targetId;
     const personaArea = ["персони", "jobs", "матриця"].includes(sectionId);
+    const structureArea = sectionId === "структура";
     for (const link of nav.querySelectorAll("a")) {
       link.removeAttribute("aria-current");
       if (pageKey(link.href) !== currentPage) continue;
       const linkHash = decodeURIComponent(new URL(link.href).hash);
-      if (!linkHash || (linkHash === "#персони" && personaArea) || (linkHash === "#ресерч" && !personaArea)) {
+      if (!linkHash || (linkHash === "#персони" && personaArea) || (linkHash === "#структура" && structureArea) || (linkHash === "#ресерч" && !personaArea && !structureArea)) {
         link.setAttribute("aria-current", linkHash ? "location" : "page");
       }
     }
