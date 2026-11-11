@@ -101,13 +101,14 @@ if len(matrix_rows) != 17:
 matrix_cells = [[cell.strip() for cell in row.split("|")] for row in matrix_rows]
 if any(len(row) != 6 for row in matrix_cells):
     raise ValueError("JTBD matrix needs exactly six columns")
-matrix_head = "".join(f'<th scope="col">{inline(cell)}</th>' for cell in matrix_cells[0])
+matrix_head = "".join(f'<th scope="col" role="columnheader" id="jtbd-col-{index}">{inline(cell)}</th>' for index, cell in enumerate(matrix_cells[0]))
 matrix_body_html = "\n".join(
-    "<tr>" + "".join(
-        (f'<th scope="row">{inline(cell)}</th>' if index == 0 else f'<td>{inline(cell)}</td>')
+    f'<tr role="row"><th scope="row" role="rowheader" id="jtbd-row-{row_index}">{inline(row[0])}</th>' + "".join(
+        f'<td role="cell" headers="jtbd-row-{row_index} jtbd-col-{index}"><span class="matrix-cell-label" aria-hidden="true">{inline(matrix_cells[0][index])}</span><span class="matrix-cell-value">{inline(cell)}</span></td>'
         for index, cell in enumerate(row)
+        if index > 0
     ) + "</tr>"
-    for row in matrix_cells[2:]
+    for row_index, row in enumerate(matrix_cells[2:])
 )
 matrix_intro = matrix_before_conclusion.split("|", 1)[0].strip()
 matrix_after_table = matrix_before_conclusion.splitlines()[-1].strip()
@@ -138,8 +139,8 @@ def render_persona_sections() -> str:
       <div class="section-title"><h2 id="matrix-heading">JTBD-матриця</h2></div>
       <div class="matrix-explainer">{paragraphs(matrix_intro)}</div>
       <p class="legend"><span class="unknown">[?]</span> важливість або стан не встановлено <span class="hypothesis-label">гіпотеза</span> потреба чи рішення без достатнього підтвердження.</p>
-      <div class="table-wrap" tabindex="0" role="region" aria-label="JTBD-матриця, прокручується горизонтально">
-        <table><caption>Усі 15 jobs із jtbd.md · важливість для трьох персон, функція продукту й конкуренти</caption><thead><tr>{matrix_head}</tr></thead><tbody>{matrix_body_html}</tbody></table>
+      <div class="table-wrap">
+        <table role="table"><caption>Усі 15 jobs із jtbd.md · важливість для трьох персон, функція продукту й конкуренти</caption><colgroup><col class="matrix-job"><col class="matrix-persona"><col class="matrix-persona"><col class="matrix-persona"><col class="matrix-detail"><col class="matrix-detail"></colgroup><thead role="rowgroup"><tr role="row">{matrix_head}</tr></thead><tbody role="rowgroup">{matrix_body_html}</tbody></table>
       </div>
       <div class="matrix-note">{paragraphs(matrix_note)}</div>
       <div class="mvp"><h3>Висновок для ядра MVP</h3>{paragraphs(matrix_conclusion)}</div>
